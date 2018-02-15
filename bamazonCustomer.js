@@ -1,4 +1,23 @@
+// require mysql
+var mysql = require('mysql');
+// require inquirer
+var inquirer = require('inquirer');
 // create MySQL database called bamazon
+var connection = mysql.createConnection({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: ''
+});
+
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log('Connected!');
+    connection.query('CREATE DATABASE IF NOT EXISTS bamazon', function(err, result) {
+            if (err) throw err;
+            connection.end();
+        });
+});
 
     // create a 'products' table that includes
 
@@ -13,10 +32,6 @@
         // stock_quantity
 
     // populate the database with 10 mock products
-
-// require mysql
-
-// require inquirer
 
 // create user interaction
 
