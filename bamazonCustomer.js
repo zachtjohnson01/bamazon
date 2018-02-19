@@ -1,9 +1,17 @@
 // require mysql
-var mysql = require('mysql');
+const mysql = require('mysql');
+
 // require inquirer
-var inquirer = require('inquirer');
+const inquirer = require('inquirer');
+
+// require cli-table to display table
+const Table = require('cli-table');
+
+// require font.js for display
+const prettyFont = require('./font.js');
+
 // create MySQL database called bamazon
-var connection = mysql.createConnection({
+const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
     user: 'root',
@@ -11,75 +19,130 @@ var connection = mysql.createConnection({
     database: 'bamazon'
 });
 
+// establish connection with MySQL database
 connection.connect(function(err) {
     if (err) throw err;
-    console.log('Connected!');
+    start();
 });
 
-    // create a 'products' table that includes
-
-        // item_id
-
-        // product_name
-
-        // department_name
-
-        // price
-
-        // stock_quantity
-
-        // populate the database with 10 mock products
-
-function displayProducts() {
-    let query = 'SELECT * FROM product'
-    connection.query(query, function(err, result) {
-        if (err) throw err;
-        console.log(result);
-        connection.end();
+function start() {
+    prettyFont('Bamazon','huge','red');
+    prettyFont('Would you like to make a purchase?','chrome','red');
+    inquirer.prompt([
+        {
+            name: 'purchase',
+            type: 'input',
+            message: 'Type (Y) for yes or (N) for no -->',
+            validate: function(value) {
+                if (value === 'y' || value === 'Y' || value === 'n' || value === 'N') {
+                    return true
+                } else {
+                    return 'Must type (Y) or (N)'
+                }
+            }
+        }
+    ]).then(function(answer) {
+        if (answer.purchase.toUpperCase() === 'Y') {
+            makePurchase()
+        } else {
+            connection.end()
+        }
     })
 };
 
-displayProducts();
+function makePurchase() {
+    // retrieve table data from mySQL database
+    connection.query('SELECT * FROM product', function(err, results) {
+        if (err) throw err;
+        displayProducts(results);
+        inquirer.prompt([
+            {
+                name: 'productId',
+                type: 'input',
+                message: 'Please type the Id Number of the item that you would like to purchase?'
+            }, 
+            {
+                name: 'quantity',
+                type: 'input',
+                message: 'How many of this product would you like?'
+            }
+        ]).then(function(answer){
+            purchaseItem(answer,results);
+        });
+    });
+};
 
-purchaseProduct();
+function displayProducts(results) {
+    // display received items in a table using cli-table
+    var table = new Table({
+        head: ['Id','Item','Department','Price','Quantity'],
+        colWidths: [5,20,20,10,10]
+    });
+    for (var i = 0; i < results.length; i++) {
+        table.push(
+            [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
+        )
+    }
+    console.log(table.toString());
+};
 
-function purchaseProduct() {
-
-    // create user interaction
+function makeAnotherPurchase() {
+    prettyFont('Would you like to make another purchase?','chrome','blue');
     inquirer.prompt([
         {
-            name: 'productId',
+            name: 'AnotherPurchase',
             type: 'input',
-            message: 'What is the id number of the product that you would like to buy?'
-        }, 
-        {
-            name: 'quantity',
-            type: 'input',
-            message: 'How many of this product would you like to buy?'
+            message: 'Type (Y) for yes or (N) for no -->',
+            validate: function(value) {
+                if (value === 'y' || value === 'Y' || value === 'n' || value === 'N') {
+                    return true
+                } else {
+                    return 'Must type (Y) or (N)'
+                }
+            }
         }
-    ]).then(function(answers){
-        console.log(answers)
+    ]).then(function(answer){
+        if (answer.AnotherPurchase.toUpperCase() === 'Y') {
+            makePurchase();
+        } else {
+            connection.end()
+        }
     })
-    // display all items available for sale (id, name, price)
+};
 
-    // prompt user:
-    
-        // id of product they would like to buy
-    
-        // quantity of units they would like to buy
-    
-    // verify store has enough quantity of that product to meet customer's request
-    
-        // if not, display 'Out of stock', and prevent order completion
-    
+function purchaseItem(answer,results){
+    let chosenItem;
+    for (var i = 0; i < results.length; i++) {
+        if (parseInt(results[i].item_id) === parseInt(answer.productId)) {
+            chosenItem = results[i];
+        }
+    };
+    if (chosenItem.stock_quantity < 1) {
+        console.log('Out of Stock')
+        makeAnotherPurchase();
+    } else {
         // if so, fulfill customer order
-    
-            // update SQL database to reflect remaining quantity
-    
-            // once the update goes through, show customer the total cost of their purchase
-}
+        reduceStock(chosenItem,answer)
+    };
+};
 
+function reduceStock(chosenItem,answer) {
+    var updatedQuantity = chosenItem.stock_quantity - answer.quantity;
+    // update SQL database to reflect remaining quantity
+    connection.query(
+        "UPDATE product SET ? WHERE ?",
+        [
+            {
+                stock_quantity: stock_quantity = updatedQuantity
+            },
+            {
+                item_id: chosenItem.item_id
+            }
+        ], function(error) {
+            if (error) throw err;
 
-
-
-
+            prettyFont(`Thank you for your purchase. Your total is $${answer.quantity * chosenItem.price}`,'chrome','green');
+            makeAnotherPurchase();
+        }
+    );
+};
