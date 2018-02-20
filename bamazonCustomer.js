@@ -127,8 +127,8 @@ function purchaseItem(answer,results){
 };
 
 function reduceStock(chosenItem,answer) {
-    var updatedQuantity = chosenItem.stock_quantity - answer.quantity;
-    // update SQL database to reflect remaining quantity
+    let updatedQuantity = parseInt(chosenItem.stock_quantity) - parseInt(answer.quantity);
+    // update mySQL database to reflect remaining quantity
     connection.query(
         "UPDATE product SET ? WHERE ?",
         [
