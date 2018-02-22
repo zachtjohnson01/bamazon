@@ -2,6 +2,8 @@
 
 An Amazon-like application run in the terminal
 
+#### Customer Actions
+
 <img src="images/purchase_1.gif?raw=true" alt="Customer Order" width="800px" />
 
 
@@ -12,11 +14,8 @@ An Amazon-like application run in the terminal
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+1. [Node.js](https://nodejs.org/en/)
+2. [mySQL](https://dev.mysql.com/doc/)
 
 ### Installing
 
