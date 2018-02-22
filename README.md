@@ -4,14 +4,14 @@ An Amazon-like application run in the terminal
 
 ### Customer Actions
 
-1. Select y to make a purchase
+1. Enter 'Y' to make a purchase
 
-<img src="images/purchase_1.gif?raw=true" alt="Customer Order" width="800px" />
+<img src="images/purchase_1.gif?raw=true" alt="Customer Order" width="500px" />
 
 2. Enter id of item to purchase
 3. Enter quantity of items to purchase
 
-<img src="images/purchase_2.gif?raw=true" alt="Customer Order" width="800px" />
+<img src="images/purchase_2.gif?raw=true" alt="Customer Order" width="500px" />
 
 ## Getting Started
 
@@ -23,21 +23,15 @@ An Amazon-like application run in the terminal
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
+1. Clone the Git repository
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+   ```
+   $ git clone <repo>
+   ```
+2. Navigate to the directory and install the dependencies 
+   ```
+   $ npm install
+   ```
 
 
 ## Built With
@@ -50,10 +44,6 @@ End with an example of getting some data out of the system or using it for a lit
 ## Authors
 
 * [Zach Johnson](https://github.com/zachtjohnson01)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
