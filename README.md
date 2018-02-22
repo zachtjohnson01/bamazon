@@ -2,10 +2,14 @@
 
 An Amazon-like application run in the terminal
 
-#### Customer Actions
+### Customer Actions
+
+1. Select y to make a purchase
 
 <img src="images/purchase_1.gif?raw=true" alt="Customer Order" width="800px" />
 
+2. Enter id of item to purchase
+3. Enter quantity of items to purchase
 
 <img src="images/purchase_2.gif?raw=true" alt="Customer Order" width="800px" />
 
