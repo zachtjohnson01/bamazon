@@ -27,7 +27,7 @@ connection.connect(function(err) {
 
 function start() {
     prettyFont('Bamazon','huge','red');
-    prettyFont('Would you like to make a purchase?','chrome','red');
+    prettyFont('Make a purchase?','chrome','red');
     inquirer.prompt([
         {
             name: 'purchase',
@@ -78,7 +78,7 @@ function displayProducts(results) {
         head: ['Id','Item','Department','Price','Quantity'],
         colWidths: [5,20,20,10,10]
     });
-    for (var i = 0; i < results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
         table.push(
             [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
         )
@@ -87,7 +87,7 @@ function displayProducts(results) {
 };
 
 function makeAnotherPurchase() {
-    prettyFont('Would you like to make another purchase?','chrome','blue');
+    prettyFont('Make another purchase?','chrome','blue');
     inquirer.prompt([
         {
             name: 'AnotherPurchase',
@@ -122,7 +122,8 @@ function purchaseItem(answer,results){
         makeAnotherPurchase();
     } else {
         // if so, fulfill customer order
-        reduceStock(chosenItem,answer)
+        reduceStock(chosenItem,answer);
+        increaseRevenue(chosenItem,answer);
     };
 };
 
@@ -141,8 +142,26 @@ function reduceStock(chosenItem,answer) {
         ], function(error) {
             if (error) throw err;
 
-            prettyFont(`Thank you for your purchase. Your total is $${answer.quantity * chosenItem.price}`,'chrome','green');
+            prettyFont(`Thank you. Your total is $${answer.quantity * chosenItem.price}`,'chrome','green');
             makeAnotherPurchase();
         }
     );
 };
+
+function increaseRevenue(chosenItem,answer) {
+    let updatedRevenue = parseInt(chosenItem.product_sales) + (parseInt(answer.quantity) * parseInt(chosenItem.price));
+    // update mysQL database to reflect the updated product_sales
+    connection.query(
+        "UPDATE product SET ? WHERE ?",
+        [
+            {
+                product_sales: product_sales = updatedRevenue
+            },
+            {
+                item_id: chosenItem.item_id
+            }
+        ], function(error) {
+            if (error) throw error;
+        }
+    );
+}

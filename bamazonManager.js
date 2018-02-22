@@ -67,7 +67,6 @@ function start() {
     })
 };
 
-
 // View Products for Sale
 function viewProducts(results) {
     // display received items in a table using cli-table

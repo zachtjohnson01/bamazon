@@ -4,7 +4,7 @@ CREATE DATABASE bamazon;
 
 USE bamazon;
 
-CREATE TABLE products (
+CREATE TABLE product (
 
 	item_id INT AUTO_INCREMENT,
     
@@ -21,3 +21,20 @@ CREATE TABLE products (
 );
 
 SELECT * FROM products;
+
+
+CREATE TABLE department (
+
+    department_id INT AUTO_INCREMENT,
+
+    department_name VARCHAR(255) NOT NULL,
+
+    over_head_costs DECIMAL(13,4) NOT NULL,
+
+    primary key (department_id)
+);
+
+
+ALTER TABLE product
+
+ADD product_sales DECIMAL(13,4) NOT NULL;
