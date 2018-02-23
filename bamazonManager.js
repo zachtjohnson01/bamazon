@@ -39,83 +39,133 @@ function start() {
         // retrieve table data from mySQL database
         switch(answers.manager) {
             case 'View Products for Sale':
-                connection.query('SELECT * FROM product', function(err, results) {
-                    if (err) throw err;
-                    viewProducts(results);
-                    anotherAction();
-                })
+                viewProductsAlone();
                 break;
             case 'View Low Inventory':
-                connection.query('SELECT * FROM product WHERE stock_quantity < 5', function(err, results) {
-                    if (err) throw err;
-                    lowInventory(results);
-                });
+                lowInventory();
                 break;
             case 'Add Inventory':
-                connection.query('SELECT * FROM product', function(err, results) {
-                    if (err) throw err;
-                    addInventory(results);
-                });
+                addInventory();
                 break;
             case 'Add New Product':
-                connection.query('SELECT * FROM product', function(err, results) {
+                connection.query(
+                    'SELECT * FROM product'
+                    , function(err, results) {
                     if (err) throw err;
                     newProduct(results);
                 });
                 break;
-        }
+        } 
     })
 };
 
 // View Products for Sale
-function viewProducts(results) {
-    // display received items in a table using cli-table
+function viewProductsCombo() {
     var table = new Table({
-        head: ['Id','Item','Department','Price','Quantity'],
+        head: ['Id','Item','Department Id','Price','Quantity'],
         colWidths: [5,20,20,10,10]
     });
-    for (var i = 0; i < results.length; i++) {
-        table.push(
-            [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
-        )
-    }
-    console.log(table.toString());
+    connection.query(
+        `SELECT product.item_id, product.product_name, department.department_name, product.price, product.stock_quantity
+        FROM product
+        LEFT JOIN department
+        ON product.department_id = department.department_id
+        ORDER BY item_id;`
+        , function(err, results) {
+        if (err) {
+            throw err;
+        } else {
+            // display received items in a table using cli-table
+            for (var i = 0; i < results.length; i++) {
+                table.push(
+                    [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
+                )
+            }
+        }
+        console.log(table.toString());
+    })
 };
-
-// View low inventory
-function lowInventory(results) {
-    console.log('View Low Inventory')
-        // display received items in a table using cli-table
-        var table = new Table({
-            head: ['Id','Item','Department','Price','Quantity'],
-            colWidths: [5,20,20,10,10]
-        });
-        for (var i = 0; i < results.length; i++) {
-            table.push(
-                [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
-            )
+// View Products for Sale
+function viewProductsAlone() {
+    var table = new Table({
+        head: ['Id','Item','Department Id','Price','Quantity'],
+        colWidths: [5,20,20,10,10]
+    });
+    connection.query(
+        `SELECT product.item_id, product.product_name, department.department_name, product.price, product.stock_quantity
+        FROM product
+        LEFT JOIN department
+        ON product.department_id = department.department_id
+        ORDER BY item_id;`
+        , function(err, results) {
+        if (err) {
+            throw err;
+        } else {
+            // display received items in a table using cli-table
+            for (var i = 0; i < results.length; i++) {
+                table.push(
+                    [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
+                )
+            }
         }
         console.log(table.toString());
         anotherAction();
+    })
+};
+
+// View low inventory
+function lowInventory() {
+    connection.query(
+        `SELECT product.item_id, product.product_name, department.department_name, product.price, product.stock_quantity
+        FROM product
+        INNER JOIN department
+        ON product.department_id = department.department_id AND product.stock_quantity < 5
+        ORDER BY item_id;`
+        , function(err, results) {
+        if (err) {
+            throw err;
+        } else {
+            // display received items in a table using cli-table
+            var table = new Table({
+                head: ['Id','Item','Department','Price','Quantity'],
+                colWidths: [5,20,20,10,10]
+            });
+            for (var i = 0; i < results.length; i++) {
+                table.push(
+                    [results[i].item_id, results[i].product_name, results[i].department_name, `$${results[i].price}`, results[i].stock_quantity]
+                )
+            }
+            console.log(table.toString());
+            anotherAction();
+        }
+    });
 };
 
 // Add to Inventory
-function addInventory(results) {
-    viewProducts(results);
-    inquirer.prompt([
-        {
-            name: 'productId',
-            type: 'input',
-            message: 'Please type the Id Number of the item that you would like to add invetory to.'
-        },
-        {
-            name: 'quantity',
-            type: 'input',
-            message: 'How many of this product would you like to add?'
+function addInventory() {
+    viewProductsCombo();
+    connection.query(
+        'SELECT * FROM product'
+        , function(err, results) {
+        if (err) {
+            throw err;
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'productId',
+                    type: 'input',
+                    message: 'Please type the item id that you would like to add invetory to.'
+                },
+                {
+                    name: 'quantity',
+                    type: 'input',
+                    message: 'How many of this product would you like to add?'
+                }
+            ]).then(function(answers) {
+                matchItem(results,answers);
+            })
         }
-    ]).then(function(answers) {
-        matchItem(results, answers);
-    })
+    });
 };
 
 function matchItem(results,answers) {
@@ -170,40 +220,78 @@ function anotherAction() {
             connection.end()
         }
     })
-}
+};
 
 // Add New Product
 function newProduct(results) {
-    inquirer.prompt([
-        {
-            name: 'newItem',
-            type: 'input',
-            message: 'Name of the item you would like to add?'
-        },
-        {
-            name: 'newDepartment',
-            type: 'input',
-            message: 'Name of the department of this item?'
-        },
-        {
-            name: 'newPrice',
-            type: 'input',
-            message: 'Price of the this item?'
-        },
-        {
-            name: 'newQuantity',
-            type: 'input',
-            message: 'Quantity of the item?'
+    viewDepartments();
+    connection.query(
+        `SELECT * FROM department;`
+        ,function(err,result) {
+            if (err) {
+                throw err;
+            } else {
+                inquirer.prompt([
+                    {
+                        name: 'newItem',
+                        type: 'input',
+                        message: 'Name of the item you would like to add?'
+                    },
+                    {
+                        name: 'newQuantity',
+                        type: 'input',
+                        message: 'Quantity of the item?'
+                    },
+                    {
+                        name: 'newPrice',
+                        type: 'input',
+                        message: 'Price of the this item?'
+                    },
+                    {
+                        name: 'newDepartment',
+                        type: 'input',
+                        message: 'Department id of this item?',
+                    }
+                ]).then(function(answers) {
+                    let newItem = answers.newItem;
+                    let newPrice = answers.newPrice;
+                    let newQuantity = answers.newQuantity;
+                    let newDepartment = answers.newDepartment;
+                    connection.query(
+                        `INSERT INTO product (product_name,price,stock_quantity,department_id)
+                        VALUES ("${newItem}","${parseFloat(newPrice)}",${parseInt(newQuantity)},${newDepartment});`
+                    ,function(error) {
+                        if (error) throw error
+                        prettyFont(`Successfully added ${newItem} to inventory`,'chrome','green');
+                        anotherAction();
+                    })
+                })
+
+            }
         }
-    ]).then(function(answers) {
-        connection.query(
-            `INSERT INTO product (product_name,department_name,price,stock_quantity)
-            VALUES ("${answers.newItem}","${answers.newDepartment}",${parseFloat(answers.newPrice)},${parseInt(answers.newQuantity)});`
-        ,function(error) {
-            if (error) throw error
-            prettyFont(`Successfully added ${answers.newItem} to inventory`,'chrome','green');
-            anotherAction();
-        })
+    )
+};
+
+function viewDepartments() {
+    var table = new Table({
+        head: ['Department Id','Deparment Name','Over Head'],
+        colWidths: [20,20,20]
+    });
+    connection.query(
+        `SELECT *
+        FROM department;`
+        , function(err, results) {
+        if (err) {
+            throw err;
+        } else {
+            // display received items in a table using cli-table
+            for (var i = 0; i < results.length; i++) {
+                table.push(
+                    [results[i].department_id, results[i].department_name, results[i].over_head_costs]
+                )
+            }
+        }
+        console.log(table.toString());
     })
 };
 

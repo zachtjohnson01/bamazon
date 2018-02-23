@@ -13,6 +13,18 @@ An Amazon-like application run in the terminal
 
 <img src="images/purchase_2.gif?raw=true" alt="Customer Order" width="500px" />
 
+### Manager Actions
+
+1. Select 'View Products for Sale'
+
+2. Select 'View Low Inventory'
+
+3. Select 'Add Inventory'
+
+4. Select 'Add New Product' 
+
+### Supervisor Actions
+
 ## Getting Started
 
 
