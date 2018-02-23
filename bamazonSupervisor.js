@@ -55,7 +55,7 @@ function departmentSales() {
         colWidths: [25,25,25,25,25]
     });
     connection.query(
-        `SELECT department.department_id, department.department_name, department.over_head_costs, SUM(product.product_sales) as product_sales, SUM(product.product_sales) - department.over_head_costs  AS total_profit
+        `SELECT department.department_id, department.department_name, department.over_head_costs, COALESCE(SUM(product.product_sales),0) as product_sales, COALESCE(SUM(product.product_sales),0) - department.over_head_costs  AS total_profit
         FROM department
         LEFT JOIN product 
         ON department.department_id = product.department_id
@@ -68,11 +68,56 @@ function departmentSales() {
             )
         };
         console.log(table.toString());
+        anotherAction();
     });
 };
 
 function createDepartment() {
 
+    inquirer.prompt([
+        {
+            name: 'newDepartment',
+            type: 'input',
+            message: 'Name of the department you would like to add?'
+        },
+        {
+            name: 'overhead',
+            type: 'input',
+            message: 'Amout of overhead for this department'
+        }
+    ]).then(function(answers) {
+        connection.query(
+            `INSERT INTO department (department_name, over_head_costs)
+            VALUES ("${answers.newDepartment}","${parseFloat(answers.overhead)}");`
+        ,function(error) {
+            if (error) throw error;
+            prettyFont(`Successfully added ${answers.newDepartment}`,'chrome','green');
+            anotherAction();
+        }
+        )
+    })
 };
 
-
+function anotherAction() {
+    prettyFont('Execute another action?','chrome','blue');
+    inquirer.prompt([
+        {
+            name: 'makeAnotherAction',
+            type: 'input',
+            message: 'Type (Y) for yes or (N) for no -->',
+            validate: function(value) {
+                if (value === 'y' || value === 'Y' || value === 'n' || value === 'N') {
+                    return true
+                } else {
+                    return 'Must type (Y) or (N)'
+                }
+            }
+        }
+    ]).then(function(answers) {
+        if (answers.makeAnotherAction.toUpperCase() === 'Y') {
+            start();
+        } else {
+            connection.end()
+        }
+    })
+}
