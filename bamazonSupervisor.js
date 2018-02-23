@@ -54,32 +54,25 @@ function departmentSales() {
         head: ['department_id','department_name','over_head_costs','product_sales','total_profit'],
         colWidths: [25,25,25,25,25]
     });
-    connection.query('SELECT * FROM department', function(err, results) {
+    connection.query(
+        `SELECT department.department_id, department.department_name, department.over_head_costs, SUM(product.product_sales) as product_sales, SUM(product.product_sales) - department.over_head_costs  AS total_profit
+        FROM department
+        LEFT JOIN product 
+        ON department.department_id = product.department_id
+        GROUP BY department.department_id;`
+        , function(err, results) {
         if (err) throw err;
         for (let i = 0; i < results.length; i++) {
             table.push(
-                [results[i].department_id, results[i].department_name, results[i].over_head_costs, 'product_sales', 'total_profit']
+                [results[i].department_id, results[i].department_name, results[i].over_head_costs, results[i].product_sales, results[i].total_profit]
             )
         };
-        for (let i = 0; i < results.length; i++) {
-            selectProductSales(results[i].department_name)
-        }
         console.log(table.toString());
     });
-
-
 };
 
 function createDepartment() {
 
-};
-function selectProductSales(department) {
-
-    connection.query(`SELECT SUM(product_sales) FROM product WHERE department_name = '${department}';`,
-    function(error,result) {
-        if (error) throw error;
-        Object.values(result[0])[0];
-    });
 };
 
 
