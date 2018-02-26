@@ -17,13 +17,29 @@ An Amazon-like application run in the terminal
 
 1. Select 'View Products for Sale'
 
+<img src="images/manager_1.gif?raw=true" alt="Customer Order" width="500px" />
+
 2. Select 'View Low Inventory'
+
+<img src="images/manager_2.gif?raw=true" alt="Customer Order" width="500px" />
 
 3. Select 'Add Inventory'
 
+<img src="images/manager_3.gif?raw=true" alt="Customer Order" width="500px" />
+
 4. Select 'Add New Product' 
 
+<img src="images/manager_4.gif?raw=true" alt="Customer Order" width="500px" />
+
 ### Supervisor Actions
+
+1. Select 'View Product Sales by Department'
+
+<img src="images/supervisor_1.gif?raw=true" alt="Customer Order" width="500px" />
+
+2. Select 'Create New Department'
+
+<img src="images/supervisor_2.gif?raw=true" alt="Customer Order" width="500px" />
 
 ## Getting Started
 
