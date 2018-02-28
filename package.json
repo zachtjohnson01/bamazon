@@ -1,0 +1,28 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "An Amazon-like application run in the terminal",
+  "main": "bamazonCustomer.js",
+  "dependencies": {
+    "cfonts": "^1.1.3",
+    "cli-table": "^0.3.1",
+    "figlet": "^1.2.0",
+    "inquirer": "^5.1.0",
+    "mysql": "^2.15.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zachtjohnson01/bamazon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zachtjohnson01/bamazon/issues"
+  },
+  "homepage": "https://github.com/zachtjohnson01/bamazon#readme"
+}
